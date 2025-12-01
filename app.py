@@ -1,68 +1,82 @@
 import os
 import json
-import time
 import uuid
 import threading
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify
 from core.scanner import start_fuzz_scan, get_scan_status, get_recent_scans
 
+# ------------------------------
+# Flask App Setup
+# ------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SCANS_DIR = os.path.join(BASE_DIR, "scans")
-if not os.path.exists(SCANS_DIR):
-    os.makedirs(SCANS_DIR)
 
-app = Flask(__name__, template_folder="templates", static_folder="static")
+app = Flask(__name__, template_folder="templates")
+
+# Ensure history file exists
+history_file = os.path.join(SCANS_DIR, "history.json")
+if not os.path.exists(history_file):
+    with open(history_file, "w") as f:
+        json.dump([], f, indent=2)
 
 
+# ------------------------------
+# Serve Frontend
+# ------------------------------
 @app.route("/")
-def home():
+def index():
     return render_template("index.html")
 
 
+# ------------------------------
+# API: Start Scan
+# ------------------------------
 @app.route("/start-scan", methods=["POST"])
 def start_scan():
-    """
-    Starts a fuzzing scan in background and returns a job id.
-    Expected JSON body: { "url": "https://example.com", "mode": "Basic Scan" }
-    """
     data = request.get_json(force=True)
+
     url = data.get("url")
     mode = data.get("mode", "Basic Scan")
 
     if not url:
-        return jsonify({"error": "Missing url"}), 400
+        return jsonify({"error": "URL is required"}), 400
 
+    # Unique scan job ID
     job_id = str(uuid.uuid4())[:8]
-    started_at = int(time.time())
 
-    # kick off background scanning thread
+    # Start background scan thread
     thread = threading.Thread(target=start_fuzz_scan, args=(job_id, url, mode), daemon=True)
     thread.start()
 
-    return jsonify({"job_id": job_id, "status": "started", "started_at": started_at}), 202
+    return jsonify({
+        "job_id": job_id,
+        "url": url,
+        "mode": mode,
+        "status": "started"
+    }), 202
 
 
+# ------------------------------
+# API: Check Scan Status
+# ------------------------------
 @app.route("/scan-status/<job_id>", methods=["GET"])
 def scan_status(job_id):
     status = get_scan_status(job_id)
     if status is None:
-        return jsonify({"error": "Job not found"}), 404
+        return jsonify({"error": "Invalid job ID"}), 404
     return jsonify(status)
 
 
+# ------------------------------
+# API: Fetch Recent Scans
+# ------------------------------
 @app.route("/scans", methods=["GET"])
 def scans():
-    """Return recent scan history"""
-    scans = get_recent_scans()
-    return jsonify(scans)
+    return jsonify(get_recent_scans())
 
 
+# ------------------------------
+# Launch Application
+# ------------------------------
 if __name__ == "__main__":
-    # ensure history file exists
-    history_file = os.path.join(SCANS_DIR, "history.json")
-    if not os.path.exists(history_file):
-        with open(history_file, "w") as f:
-            json.dump([], f, indent=2)
-
-    # run flask
     app.run(host="0.0.0.0", port=8000, debug=True)
