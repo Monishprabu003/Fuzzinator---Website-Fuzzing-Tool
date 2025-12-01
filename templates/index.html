@@ -1,285 +1,437 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <title>WebFuzz – Cyber Fuzzing Dashboard</title>
+  <meta charset="utf-8" />
+  <title>WebFuzz – Cyber Fuzzing Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0d1117;
+      --panel:#161b22;
+      --muted:#9ca3af;
+      --accent1:#6366f1;
+      --accent2:#8b5cf6;
+      --glass: rgba(79,70,229,0.12);
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{background:var(--bg);color:#e5e7eb;}
 
-    <style>
-        body {
-            margin: 0;
-            font-family: "Inter", sans-serif;
-            background: #0d1117;
-            color: #e5e7eb;
-        }
+/* layout */
+    .sidebar{
+      width:240px;height:100vh;position:fixed;left:0;top:0;
+      background:#0f1724;border-right:1px solid #111827;padding:32px 20px;box-sizing:border-box;
+    }
+    .brand{font-weight:700;font-size:22px;background:linear-gradient(90deg,var(--accent1),var(--accent2));-webkit-background-clip:text;color:transparent}
+    .nav{margin-top:28px}
+    .nav-item{
+      display:block;padding:12px 12px;border-radius:10px;color:var(--muted);text-decoration:none;margin:8px 0;cursor:pointer;
+      transition:all .18s ease;
+    }
+    .nav-item:hover{background:var(--glass);color:#fff;box-shadow:0 4px 18px rgba(0,0,0,0.4)}
+    .nav-item.active{background:rgba(79,70,229,0.22);color:#fff;box-shadow:0 6px 20px rgba(79,70,229,0.12)}
+/* main */
+    .main{margin-left:260px;padding:36px 46px;}
+    .header h1{margin:0;font-size:30px}
+    .header p{margin:6px 0 0;color:var(--muted);font-size:13px}
 
-        /* SIDEBAR */
-        .sidebar {
-            width: 240px;
-            height: 100vh;
-            background: #111827;
-            border-right: 1px solid #1f2937;
-            padding: 30px 20px;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
+/* cards */
+    .section{display:none}
+    .section.active{display:block}
+    .card{background:var(--panel);border-radius:12px;padding:20px;border:1px solid #111827;box-shadow:0 6px 24px rgba(0,0,0,0.45);margin-bottom:22px}
+    .card h2{color:#c7b5ff;margin:0 0 12px;font-size:18px}
 
-        .sidebar h2 {
-            font-size: 26px;
-            margin-bottom: 40px;
-            background: linear-gradient(90deg, #4b8df8, #9b59f6);
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: 1.2px;
-        }
+/* forms */
+    label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+    input[type="text"], select, textarea{
+      width:100%;padding:12px;border-radius:10px;background:#0f172a;border:1px solid #24303b;color:#fff;box-sizing:border-box;
+    }
+    input[type="text"]::placeholder{color:#5b6a77}
+    .btn{
+      display:inline-block;padding:12px 18px;border-radius:10px;border:none;color:#fff;background:linear-gradient(90deg,var(--accent1),var(--accent2));
+      cursor:pointer;font-weight:600;text-align:center;width:100%;transition:transform .15s ease,box-shadow .15s ease;
+    }
+    .btn:active{transform:translateY(1px)}
+    .small-btn{padding:8px 10px;width:auto;font-size:13px}
 
-        .nav-item {
-            display: block;
-            padding: 12px 10px;
-            margin: 12px 0;
-            border-radius: 8px;
-            background: transparent;
-            color: #9ca3af;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+/* table */
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:12px 10px;border-bottom:1px solid #111827;text-align:left;font-size:14px}
+    th{background:#111827;color:#a78bfa}
+    .tag{display:inline-block;padding:6px 10px;border-radius:8px;color:#fff;font-weight:700;font-size:12px}
+    .tag.pending{background:#2563eb}
+    .tag.low{background:#10b981}
+    .tag.medium{background:#f59e0b}
+    .tag.high{background:#ef4444}
 
-        .nav-item:hover,
-        .nav-item.active {
-            background: rgba(79, 70, 229, 0.2);
-            color: #fff;
-            box-shadow: 0 0 10px rgba(79, 70, 229, 0.4);
-        }
+/* layout helpers */
+    .grid{display:grid;gap:16px}
+    .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+    .grid.cols-2{grid-template-columns:repeat(2,1fr)}
+    .muted{color:var(--muted);font-size:13px}
+    .right{float:right}
 
-        /* MAIN CONTENT */
-        .main {
-            margin-left: 260px;
-            padding: 40px;
-        }
-
-        .header h1 {
-            font-size: 32px;
-            margin: 0;
-            color: #fff;
-        }
-
-        .header p {
-            color: #9ca3af;
-            margin-top: 5px;
-        }
-
-        /* CARDS */
-        .card {
-            background: #161b22;
-            padding: 25px;
-            border-radius: 14px;
-            margin-top: 25px;
-            box-shadow: 0 0 10px rgba(79, 70, 229, 0.2);
-            border: 1px solid #1f2937;
-        }
-
-        .card h2 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: #a78bfa;
-        }
-
-        /* FORM ELEMENTS */
-        input,
-        select {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0 20px 0;
-            border-radius: 10px;
-            background: #0f172a;
-            color: #fff;
-            border: 1px solid #334155;
-            transition: 0.2s;
-        }
-
-        input:focus,
-        select:focus {
-            border-color: #6d28d9;
-            box-shadow: 0 0 10px rgba(109, 40, 217, 0.6);
-            outline: none;
-        }
-
-        /* BUTTON */
-        .scan-btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            color: #fff;
-            cursor: pointer;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            transition: 0.3s;
-        }
-
-        .scan-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.7);
-        }
-
-        /* TABLE */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th,
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #1f2937;
-        }
-
-        th {
-            background: #1f2937;
-            color: #a78bfa;
-        }
-
-        /* STATUS TAGS */
-        .tag {
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .tag.high {
-            background: #ef4444;
-        }
-
-        .tag.medium {
-            background: #f59e0b;
-        }
-
-        .tag.low {
-            background: #10b981;
-        }
-
-        .tag.pending {
-            background: #3b82f6;
-        }
-    </style>
+/* responsive */
+    @media (max-width:900px){
+      .sidebar{position:relative;width:100%;height:auto;padding:18px}
+      .main{margin-left:0;padding:18px}
+    }
+  </style>
 </head>
-
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>WebFuzz</h2>
-        <a class="nav-item active">Dashboard</a>
-        <a class="nav-item">Start Scan</a>
-        <a class="nav-item">Scan History</a>
-        <a class="nav-item">Reports</a>
-        <a class="nav-item">Settings</a>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" aria-label="sidebar">
+    <div class="brand">WebFuzz</div>
+
+    <nav class="nav" aria-label="main navigation">
+      <a class="nav-item active" data-target="dashboard-section">Dashboard</a>
+      <a class="nav-item" data-target="startscan-section">Start Scan</a>
+      <a class="nav-item" data-target="history-section">Scan History</a>
+      <a class="nav-item" data-target="reports-section">Reports</a>
+      <a class="nav-item" data-target="settings-section">Settings</a>
+    </nav>
+
+    <div style="position: absolute; bottom:20px; left:20px; right:20px; color:var(--muted); font-size:13px">
+      WebFuzz • v1.0
     </div>
+  </aside>
 
-    <!-- Main Content -->
-    <div class="main">
+  <!-- MAIN -->
+  <main class="main">
+    <header class="header">
+      <h1>Cyber Fuzzing Dashboard</h1>
+      <p class="muted">Professional • Classic • Hacker-Themed Interface</p>
+    </header>
 
-        <div class="header">
-            <h1>Cyber Fuzzing Dashboard</h1>
-            <p>Professional • Classic • Hacker-Themed Interface</p>
+    <!-- ---------- DASHBOARD (default) ---------- -->
+    <section id="dashboard-section" class="section active">
+      <div class="card">
+        <h2>Quick Overview</h2>
+        <div class="grid cols-3">
+          <div class="card" style="padding:18px;">
+            <div class="muted">Total Scans</div>
+            <div style="font-size:22px;font-weight:700" id="stat-total">0</div>
+          </div>
+
+          <div class="card" style="padding:18px;">
+            <div class="muted">Active / Pending</div>
+            <div style="font-size:22px;font-weight:700" id="stat-pending">0</div>
+          </div>
+
+          <div class="card" style="padding:18px;">
+            <div class="muted">Critical Vulns</div>
+            <div style="font-size:22px;font-weight:700" id="stat-critical">0</div>
+          </div>
         </div>
+      </div>
 
-        <!-- Scan Section -->
-        <div class="card">
-            <h2>Start a New Scan</h2>
+      <div class="card">
+        <h2>Start a New Scan (Quick)</h2>
 
-            <label>Target URL</label>
-            <input id="scan-url" type="text" placeholder="https://example.com">
+        <label>Target URL</label>
+        <input id="quick-url" type="text" placeholder="https://example.com">
 
-            <label>Scan Mode</label>
-            <select id="scan-mode">
-                <option>Basic Scan</option>
-                <option>Deep Scan</option>
-                <option>Header Fuzzing</option>
-                <option>Parameter Fuzzing</option>
-            </select>
+        <label>Scan Mode</label>
+        <select id="quick-mode">
+          <option>Basic Scan</option>
+          <option>Deep Scan</option>
+          <option>Header Fuzzing</option>
+          <option>Parameter Fuzzing</option>
+        </select>
 
-            <button class="scan-btn" onclick="startScan()">Start Fuzzing</button>
+        <div style="margin-top:12px"><button class="btn" id="quick-start">Start Fuzzing</button></div>
+      </div>
+
+      <div class="card">
+        <h2>Recent Scan Results</h2>
+        <div class="muted">Latest activity from scan history</div>
+
+        <table id="recent-table">
+          <thead>
+            <tr><th>ID</th><th>URL</th><th>Vulnerabilities</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <!-- filled dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- START SCAN ---------- -->
+    <section id="startscan-section" class="section">
+      <div class="card">
+        <h2>Start a New Scan</h2>
+
+        <label>Target URL</label>
+        <input id="scan-url" type="text" placeholder="https://target.example.com">
+
+        <label>Scan Mode</label>
+        <select id="scan-mode">
+          <option>Basic Scan</option>
+          <option>Deep Scan</option>
+          <option>Header Fuzzing</option>
+          <option>Parameter Fuzzing</option>
+        </select>
+
+        <label>Notes (optional)</label>
+        <textarea id="scan-notes" rows="3" placeholder="Add notes for this scan (internal)"></textarea>
+
+        <div style="margin-top:12px"><button class="btn" id="start-btn">Start Fuzzing</button></div>
+      </div>
+    </section>
+
+    <!-- ---------- HISTORY ---------- -->
+    <section id="history-section" class="section">
+      <div class="card">
+        <h2>Scan History</h2>
+        <div class="muted">Full list of saved scans (newest first)</div>
+
+        <table id="history-table">
+          <thead>
+            <tr><th>ID</th><th>URL</th><th>Mode</th><th>Vulns</th><th>Started</th><th>Finished</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <!-- filled dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- REPORTS ---------- -->
+    <section id="reports-section" class="section">
+      <div class="card">
+        <h2>Reports</h2>
+        <div class="muted">Export scan history as JSON or CSV. You can also view individual raw logs in the <code>scans/raw_logs/</code> folder on the server.</div>
+        <div style="margin-top:12px;display:flex;gap:10px;">
+          <button class="btn small-btn" id="export-json">Download JSON</button>
+          <button class="btn small-btn" id="export-csv">Download CSV</button>
+          <button class="btn small-btn" id="refresh-history">Refresh History</button>
         </div>
+      </div>
+    </section>
 
-        <!-- Results Section -->
-        <div class="card">
-            <h2>Recent Scan Results</h2>
+    <!-- ---------- SETTINGS ---------- -->
+    <section id="settings-section" class="section">
+      <div class="card">
+        <h2>Settings</h2>
+        <label>Polling interval (ms)</label>
+        <input id="setting-poll" type="text" placeholder="2000" />
+        <div style="margin-top:12px"><button class="btn small-btn" id="save-settings">Save Settings</button></div>
 
-            <table id="results-table">
-                <tr>
-                    <th>ID</th>
-                    <th>URL</th>
-                    <th>Vulnerabilities</th>
-                    <th>Status</th>
-                </tr>
-            </table>
-        </div>
-    </div>
+        <div style="margin-top:14px" class="muted">Settings are saved in browser localStorage and affect the UI only.</div>
+      </div>
+    </section>
 
-    <!-- JavaScript -->
-    <script>
-        function startScan() {
-            const url = document.getElementById("scan-url").value;
-            const mode = document.getElementById("scan-mode").value;
+  </main>
 
-            if (!url.trim()) {
-                alert("Please enter a URL!");
-                return;
-            }
+  <!-- SCRIPT: navigation + API integration + helpers -->
+  <script>
+    (function(){
+      // --- configuration & helpers
+      const DEFAULT_POLL = 2000;
+      let POLL_MS = Number(localStorage.getItem('webfuzz_poll')) || DEFAULT_POLL;
 
-            // Call backend endpoint
-            fetch("/start-scan", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ url: url, mode: mode })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const jobId = data.job_id;
+      function $(s){ return document.querySelector(s) }
+      function $all(s){ return Array.from(document.querySelectorAll(s)) }
 
-                    const table = document.getElementById("results-table");
+      // --- navigation
+      $all('.nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          const target = item.dataset.target;
+          // toggle active
+          $all('.nav-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          // show/hide sections
+          $all('.section').forEach(sec => sec.classList.remove('active'));
+          document.getElementById(target).classList.add('active');
 
-                    const newRow = table.insertRow();
-                    newRow.innerHTML = `
-                        <td>${jobId}</td>
-                        <td>${url}</td>
-                        <td>–</td>
-                        <td><span class="tag pending">Pending</span></td>
-                    `;
+          // special: if history/reports loaded, refresh
+          if (target === 'history-section' || target === 'reports-section' || target === 'dashboard-section') {
+            loadRecentScans();
+          }
+        });
+      });
 
-                    // Check status after delay
-                    setTimeout(() => checkScanStatus(jobId, newRow), 2000);
-                });
+      // --- fetch recent scans and update UI
+      async function loadRecentScans(){
+        try {
+          const res = await fetch('/scans');
+          if (!res.ok) throw new Error('Failed to fetch scans');
+          const data = await res.json();
+
+          // stats
+          const total = data.length;
+          const pending = data.filter(s => s.status === 'started' || s.status === 'pending').length;
+          const critical = data.reduce((acc,s) => acc + (s.vulns_found >= 3 ? 1:0), 0);
+
+          $('#stat-total').innerText = total;
+          $('#stat-pending').innerText = pending;
+          $('#stat-critical').innerText = critical;
+
+          // recent table (5 rows)
+          const recentTbody = $('#recent-table tbody');
+          recentTbody.innerHTML = '';
+          data.slice(0,6).forEach(s => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${s.job_id}</td>
+              <td>${s.url}</td>
+              <td>${s.vulns_found ?? '–'}</td>
+              <td>${renderStatusTag(s)}</td>
+            `;
+            recentTbody.appendChild(tr);
+          });
+
+          // full history table
+          const histTbody = $('#history-table tbody');
+          histTbody.innerHTML = '';
+          data.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${s.job_id}</td>
+              <td>${s.url}</td>
+              <td>${s.mode ?? '–'}</td>
+              <td>${s.vulns_found ?? 0}</td>
+              <td>${s.started_at ? new Date(s.started_at).toLocaleString() : '–'}</td>
+              <td>${s.finished_at ? new Date(s.finished_at).toLocaleString() : '–'}</td>
+              <td>${renderStatusTag(s)}</td>
+            `;
+            histTbody.appendChild(tr);
+          });
+
+        } catch (err) {
+          console.error('loadRecentScans error', err);
         }
+      }
 
-        function checkScanStatus(jobId, row) {
-            fetch(`/scan-status/${jobId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "finished" || data.status === "vulnerable") {
-                        const vulns = data.vulns_found;
-                        row.cells[2].innerText = vulns;
+      function renderStatusTag(s){
+        const st = (s.status || '').toLowerCase();
+        if (st === 'vulnerable' || (s.vulns_found && s.vulns_found >= 3)) return `<span class="tag high">High</span>`;
+        if (st === 'finished' && (s.vulns_found && s.vulns_found > 0)) return `<span class="tag medium">Medium</span>`;
+        if (st === 'finished' && (!s.vulns_found || s.vulns_found === 0)) return `<span class="tag low">Safe</span>`;
+        return `<span class="tag pending">Pending</span>`;
+      }
 
-                        if (vulns >= 3) {
-                            row.cells[3].innerHTML = `<span class="tag high">High</span>`;
-                        } else if (vulns === 1 || vulns === 2) {
-                            row.cells[3].innerHTML = `<span class="tag medium">Medium</span>`;
-                        } else {
-                            row.cells[3].innerHTML = `<span class="tag low">Safe</span>`;
-                        }
-                    } else {
-                        row.cells[3].innerHTML = `<span class="tag pending">Pending</span>`;
-                        setTimeout(() => checkScanStatus(jobId, row), 2000);
-                    }
-                });
+      // --- Start scan (shared by Quick & Start pages)
+      async function startScanWith(url, mode){
+        if (!url || !url.trim()){
+          alert('Enter a valid URL');
+          return;
         }
-    </script>
+        try {
+          const res = await fetch('/start-scan', {
+            method:'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({url, mode})
+          });
+          if (!res.ok) {
+            const err = await res.json(); alert(err.error || 'Start failed'); return;
+          }
+          const job = await res.json();
+          // add row to recent table and poll
+          addPendingRow(job.job_id, url);
+        } catch (err) {
+          console.error('startScan err', err); alert('Failed to start scan');
+        }
+      }
 
+      function addPendingRow(jobId, url){
+        // insert to top of recent listing and history (client side)
+        const recentTbody = $('#recent-table tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${jobId}</td><td>${url}</td><td>–</td><td><span class="tag pending">Pending</span></td>`;
+        recentTbody.prepend(tr);
+        // poll status
+        const pollRow = tr;
+        pollScanStatus(jobId, pollRow);
+        // refresh full history in background
+        setTimeout(loadRecentScans, POLL_MS);
+      }
+
+      async function pollScanStatus(jobId, row){
+        try {
+          const res = await fetch(`/scan-status/${jobId}`);
+          if (res.status === 404){
+            // not yet available — try again
+            setTimeout(() => pollScanStatus(jobId,row), POLL_MS);
+            return;
+          }
+          const data = await res.json();
+          if (!data) { setTimeout(()=>pollScanStatus(jobId,row), POLL_MS); return; }
+
+          // update row cells
+          const vulns = data.vulns_found ?? 0;
+          row.cells[2].innerText = vulns;
+          // status cell
+          if (data.status === 'vulnerable' || vulns >= 3){
+            row.cells[3].innerHTML = `<span class="tag high">High</span>`;
+          } else if (data.status === 'finished'){
+            row.cells[3].innerHTML = `<span class="tag low">Safe</span>`;
+          } else { // pending/start
+            row.cells[3].innerHTML = `<span class="tag pending">Pending</span>`;
+            setTimeout(()=>pollScanStatus(jobId,row), POLL_MS);
+            return;
+          }
+          // update history view
+          loadRecentScans();
+        } catch (err) {
+          console.error('pollScanStatus err', err);
+          setTimeout(()=>pollScanStatus(jobId,row), POLL_MS);
+        }
+      }
+
+      // attach listeners
+      $('#quick-start').addEventListener('click', ()=> {
+        const url = $('#quick-url').value;
+        const mode = $('#quick-mode').value;
+        startScanWith(url, mode);
+      });
+      $('#start-btn').addEventListener('click', ()=> {
+        const url = $('#scan-url').value;
+        const mode = $('#scan-mode').value;
+        startScanWith(url, mode);
+      });
+
+      // reports: fetch and export
+      async function fetchHistory(){ const r = await fetch('/scans'); return r.ok?await r.json():[]; }
+
+      $('#export-json').addEventListener('click', async ()=> {
+        const scans = await fetchHistory();
+        const blob = new Blob([JSON.stringify(scans, null, 2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'webfuzz_history.json'; a.click(); URL.revokeObjectURL(url);
+      });
+
+      $('#export-csv').addEventListener('click', async ()=> {
+        const scans = await fetchHistory();
+        if (!scans || scans.length===0){ alert('No scans to export'); return; }
+        const rows = [['job_id','url','mode','status','vulns_found','started_at','finished_at']];
+        scans.forEach(s => rows.push([s.job_id, s.url, s.mode || '', s.status || '', s.vulns_found || 0, s.started_at||'', s.finished_at||'']));
+        const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
+        const a=document.createElement('a'); a.href=url; a.download='webfuzz_history.csv'; a.click(); URL.revokeObjectURL(url);
+      });
+
+      $('#refresh-history').addEventListener('click', ()=> loadRecentScans());
+
+      // settings
+      $('#save-settings').addEventListener('click', ()=> {
+        const v = Number($('#setting-poll').value) || DEFAULT_POLL;
+        POLL_MS = v; localStorage.setItem('webfuzz_poll', String(v));
+        alert('Settings saved (polling interval ' + POLL_MS + ' ms)');
+      });
+
+      // initial load
+      (function init(){
+        // set settings input
+        $('#setting-poll').value = POLL_MS;
+        // load scans
+        loadRecentScans();
+        // auto refresh every 10s to update dashboard
+        setInterval(loadRecentScans, 10000);
+      })();
+
+    })();
+  </script>
 </body>
-
 </html>

@@ -1,0 +1,55 @@
+{
+  "job_id": "3f93260f",
+  "url": "https://amazon.com",
+  "logs": [
+    {
+      "timestamp": "2025-12-01T06:47:57.306859Z",
+      "payload": "X-Forwarded-For: 127.0.0.1",
+      "test_url": "https://amazon.com/?test=X-Forwarded-For: 127.0.0.1",
+      "status_code": 503,
+      "response_snippet": "<!-- To discuss automated access to Amazon data please contact api-services-support@amazon.com. For information about migrating to our APIs refer to our Marketplace APIs at https://developer.amazonservices.com/ref=rm_5_sv, or our Product Advertising API at https://affiliate-program.amazon.com/gp/advertising/api/detail/main.html/ref=rm_5_ac for advertising use cases. --> <!doctype html> <html> <head> <meta charset=\"utf-8\"> <meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\"> <meta name=\"viewport"
+    },
+    {
+      "timestamp": "2025-12-01T06:47:59.645057Z",
+      "payload": "X-Originating-IP: 127.0.0.1",
+      "test_url": "https://amazon.com/?test=X-Originating-IP: 127.0.0.1",
+      "status_code": 503,
+      "response_snippet": "<!-- To discuss automated access to Amazon data please contact api-services-support@amazon.com. For information about migrating to our APIs refer to our Marketplace APIs at https://developer.amazonservices.com/ref=rm_5_sv, or our Product Advertising API at https://affiliate-program.amazon.com/gp/advertising/api/detail/main.html/ref=rm_5_ac for advertising use cases. --> <!doctype html> <html> <head> <meta charset=\"utf-8\"> <meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\"> <meta name=\"viewport"
+    },
+    {
+      "timestamp": "2025-12-01T06:48:01.578574Z",
+      "payload": "X-Remote-IP: 127.0.0.1",
+      "test_url": "https://amazon.com/?test=X-Remote-IP: 127.0.0.1",
+      "status_code": 503,
+      "response_snippet": "<!-- To discuss automated access to Amazon data please contact api-services-support@amazon.com. For information about migrating to our APIs refer to our Marketplace APIs at https://developer.amazonservices.com/ref=rm_5_sv, or our Product Advertising API at https://affiliate-program.amazon.com/gp/advertising/api/detail/main.html/ref=rm_5_ac for advertising use cases. --> <!doctype html> <html> <head> <meta charset=\"utf-8\"> <meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\"> <meta name=\"viewport"
+    },
+    {
+      "timestamp": "2025-12-01T06:48:03.005836Z",
+      "payload": "Referer: <script>alert(1)</script>",
+      "test_url": "https://amazon.com/?test=Referer: <script>alert(1)</script>",
+      "status_code": 503,
+      "response_snippet": "<!-- To discuss automated access to Amazon data please contact api-services-support@amazon.com. For information about migrating to our APIs refer to our Marketplace APIs at https://developer.amazonservices.com/ref=rm_5_sv, or our Product Advertising API at https://affiliate-program.amazon.com/gp/advertising/api/detail/main.html/ref=rm_5_ac for advertising use cases. --> <!doctype html> <html> <head> <meta charset=\"utf-8\"> <meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\"> <meta name=\"viewport"
+    },
+    {
+      "timestamp": "2025-12-01T06:48:05.258679Z",
+      "payload": "User-Agent: WebFuzzScanner",
+      "test_url": "https://amazon.com/?test=User-Agent: WebFuzzScanner",
+      "status_code": 503,
+      "response_snippet": "<!-- To discuss automated access to Amazon data please contact api-services-support@amazon.com. For information about migrating to our APIs refer to our Marketplace APIs at https://developer.amazonservices.com/ref=rm_5_sv, or our Product Advertising API at https://affiliate-program.amazon.com/gp/advertising/api/detail/main.html/ref=rm_5_ac for advertising use cases. --> <!doctype html> <html> <head> <meta charset=\"utf-8\"> <meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\"> <meta name=\"viewport"
+    },
+    {
+      "timestamp": "2025-12-01T06:48:07.448172Z",
+      "payload": "User-Agent: ' OR '1'='1",
+      "test_url": "https://amazon.com/?test=User-Agent: ' OR '1'='1",
+      "status_code": 503,
+      "response_snippet": "<!-- To discuss automated access to Amazon data please contact api-services-support@amazon.com. For information about migrating to our APIs refer to our Marketplace APIs at https://developer.amazonservices.com/ref=rm_5_sv, or our Product Advertising API at https://affiliate-program.amazon.com/gp/advertising/api/detail/main.html/ref=rm_5_ac for advertising use cases. --> <!doctype html> <html> <head> <meta charset=\"utf-8\"> <meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\"> <meta name=\"viewport"
+    },
+    {
+      "timestamp": "2025-12-01T06:48:08.951827Z",
+      "payload": "X-API-Version: ../../etc/passwd",
+      "test_url": "https://amazon.com/?test=X-API-Version: ../../etc/passwd",
+      "status_code": 503,
+      "response_snippet": "<!-- To discuss automated access to Amazon data please contact api-services-support@amazon.com. For information about migrating to our APIs refer to our Marketplace APIs at https://developer.amazonservices.com/ref=rm_5_sv, or our Product Advertising API at https://affiliate-program.amazon.com/gp/advertising/api/detail/main.html/ref=rm_5_ac for advertising use cases. --> <!doctype html> <html> <head> <meta charset=\"utf-8\"> <meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\"> <meta name=\"viewport"
+    }
+  ]
+}

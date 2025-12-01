@@ -1,0 +1,24 @@
+[
+  {
+    "job_id": "6ae244fa",
+    "url": "https://amazon.com",
+    "mode": "Basic Scan",
+    "status": "finished",
+    "vulns_found": 0,
+    "started_at": "2025-12-01T06:46:33.664325Z",
+    "finished_at": "2025-12-01T06:48:51.851388Z",
+    "raw_log": "scans/raw_logs/scan_6ae244fa.txt",
+    "vulnerabilities": []
+  },
+  {
+    "job_id": "3f93260f",
+    "url": "https://amazon.com",
+    "mode": "Header Fuzzing",
+    "status": "finished",
+    "vulns_found": 0,
+    "started_at": "2025-12-01T06:47:23.677198Z",
+    "finished_at": "2025-12-01T06:48:09.059316Z",
+    "raw_log": "scans/raw_logs/scan_3f93260f.txt",
+    "vulnerabilities": []
+  }
+]
