@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WebFuzz – Cyber Fuzzing Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            background: #0d1117;
+            color: #e5e7eb;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #111827;
+            border-right: 1px solid #1f2937;
+            padding: 30px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 26px;
+            margin-bottom: 40px;
+            background: linear-gradient(90deg, #4b8df8, #9b59f6);
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 1.2px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 10px;
+            margin: 12px 0;
+            border-radius: 8px;
+            background: transparent;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(79, 70, 229, 0.2);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.4);
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            margin-left: 260px;
+            padding: 40px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin: 0;
+            color: #fff;
+        }
+
+        .header p {
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+
+        /* CARDS */
+        .card {
+            background: #161b22;
+            padding: 25px;
+            border-radius: 14px;
+            margin-top: 25px;
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.2);
+            border: 1px solid #1f2937;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #a78bfa;
+        }
+
+        /* FORM ELEMENTS */
+        input,
+        select {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0 20px 0;
+            border-radius: 10px;
+            background: #0f172a;
+            color: #fff;
+            border: 1px solid #334155;
+            transition: 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #6d28d9;
+            box-shadow: 0 0 10px rgba(109, 40, 217, 0.6);
+            outline: none;
+        }
+
+        /* BUTTON */
+        .scan-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            color: #fff;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            transition: 0.3s;
+        }
+
+        .scan-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.7);
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        th {
+            background: #1f2937;
+            color: #a78bfa;
+        }
+
+        /* STATUS TAGS */
+        .tag {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .tag.high {
+            background: #ef4444;
+        }
+
+        .tag.medium {
+            background: #f59e0b;
+        }
+
+        .tag.low {
+            background: #10b981;
+        }
+
+        .tag.pending {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>WebFuzz</h2>
+        <a class="nav-item active">Dashboard</a>
+        <a class="nav-item">Start Scan</a>
+        <a class="nav-item">Scan History</a>
+        <a class="nav-item">Reports</a>
+        <a class="nav-item">Settings</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+
+        <div class="header">
+            <h1>Cyber Fuzzing Dashboard</h1>
+            <p>Professional • Classic • Hacker-Themed Interface</p>
+        </div>
+
+        <!-- Scan Section -->
+        <div class="card">
+            <h2>Start a New Scan</h2>
+
+            <label>Target URL</label>
+            <input id="scan-url" type="text" placeholder="https://example.com">
+
+            <label>Scan Mode</label>
+            <select id="scan-mode">
+                <option>Basic Scan</option>
+                <option>Deep Scan</option>
+                <option>Header Fuzzing</option>
+                <option>Parameter Fuzzing</option>
+            </select>
+
+            <button class="scan-btn" onclick="startScan()">Start Fuzzing</button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="card">
+            <h2>Recent Scan Results</h2>
+
+            <table id="results-table">
+                <tr>
+                    <th>ID</th>
+                    <th>URL</th>
+                    <th>Vulnerabilities</th>
+                    <th>Status</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        function startScan() {
+            const url = document.getElementById("scan-url").value;
+            const mode = document.getElementById("scan-mode").value;
+
+            if (!url.trim()) {
+                alert("Please enter a URL!");
+                return;
+            }
+
+            // Call backend endpoint
+            fetch("/start-scan", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url: url, mode: mode })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const jobId = data.job_id;
+
+                    const table = document.getElementById("results-table");
+
+                    const newRow = table.insertRow();
+                    newRow.innerHTML = `
+                        <td>${jobId}</td>
+                        <td>${url}</td>
+                        <td>–</td>
+                        <td><span class="tag pending">Pending</span></td>
+                    `;
+
+                    // Check status after delay
+                    setTimeout(() => checkScanStatus(jobId, newRow), 2000);
+                });
+        }
+
+        function checkScanStatus(jobId, row) {
+            fetch(`/scan-status/${jobId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "finished" || data.status === "vulnerable") {
+                        const vulns = data.vulns_found;
+                        row.cells[2].innerText = vulns;
+
+                        if (vulns >= 3) {
+                            row.cells[3].innerHTML = `<span class="tag high">High</span>`;
+                        } else if (vulns === 1 || vulns === 2) {
+                            row.cells[3].innerHTML = `<span class="tag medium">Medium</span>`;
+                        } else {
+                            row.cells[3].innerHTML = `<span class="tag low">Safe</span>`;
+                        }
+                    } else {
+                        row.cells[3].innerHTML = `<span class="tag pending">Pending</span>`;
+                        setTimeout(() => checkScanStatus(jobId, row), 2000);
+                    }
+                });
+        }
+    </script>
+
+</body>
+
+</html>
