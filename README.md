@@ -43,7 +43,6 @@ It features a **modern cyberpunk UI**, a clean backend architecture, and cloud d
 - Cybersecurity learners  
 - Pentesting students  
 - Bug bounty beginners  
-- Portfolio & interview projects  
 
 ---
 
