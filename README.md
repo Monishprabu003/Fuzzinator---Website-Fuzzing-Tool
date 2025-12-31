@@ -5,7 +5,6 @@
 </h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-Live-brightgreen?style=for-the-badge">
   <img src="https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge">
   <img src="https://img.shields.io/badge/Flask-Backend-red?style=for-the-badge">
   <img src="https://img.shields.io/badge/Fuzzing-Engine-purple?style=for-the-badge">
